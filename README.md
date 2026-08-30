@@ -121,6 +121,7 @@ where `pred` is the model's estimated probability that the image is AI-generated
 
 ## Team Contributions
 
-- *[Fill in: Name — role/contribution, e.g. "Alex — model training and robustness pipeline"]*
-- *[Fill in: Name — role/contribution]*
-- *[Fill in: Name — role/contribution]*
+- *Madhumita Thiruppathi - Model Training and Robustness Evaluation*
+- *Lee Yu Xuan - Devpost Write Up and Video*
+- *Megan Karin Lee Xin Ying - Model Training and Robustness Evaluation*
+- *Ponnusamy Saishenetha - Devpost Write Up and Video*

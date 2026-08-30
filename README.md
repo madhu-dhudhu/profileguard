@@ -10,14 +10,14 @@ Generative AI has made it trivial to create realistic fake human faces at scale,
 
 ## Development Tools & Environment
 
-- **Environment:** Google Colab (free tier, T4 GPU for training, CPU for inference)
+- **Environment:** Google Colab 
 - **Language:** Python 3
 - **Key libraries:** PyTorch, `timm` (pretrained model library), `torchvision`, OpenCV (`opencv-python-headless`), Pillow, NumPy, Matplotlib
 
 ## Model
 
 - **Architecture:** EfficientNet-B0 (pretrained on ImageNet), fine-tuned for binary classification (real vs. AI-generated)
-- **Parameters:** ~5.3M (well under the 2B parameter limit)
+- **Parameters:** ~5.3M 
 - **Training approach:** Transfer learning — early layers frozen, final blocks and classifier head fine-tuned, first on clean data then further fine-tuned with randomized robustness augmentations (JPEG compression, Gaussian blur, downscale/upscale, Gaussian noise, color jitter, center crop) applied per-image during training.
 
 ## Datasets

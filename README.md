@@ -1,12 +1,12 @@
 # ProfileGuard: Robust AI-Generated Face Detection
 
-ProfileGuard is a lightweight AI-image detector purpose-built to catch AI-generated profile pictures used in catfishing and romance scams on dating apps and social platforms. Unlike detectors that only work on clean, high-resolution images straight from a generator, ProfileGuard is trained and evaluated specifically for real-world conditions: photos that have been resized into thumbnails, JPEG-compressed on upload, blurred, cropped, or lightly filtered — exactly what happens to every profile picture on a real platform.
+ProfileGuard is a lightweight AI-image detector purpose-built to catch AI-generated profile pictures used in catfishing and romance scams on dating apps and social platforms. Unlike detectors that only work on clean, high-resolution images straight from a generator, ProfileGuard is trained and evaluated specifically for real-world conditions: photos that have been resized into thumbnails, JPEG-compressed on upload, blurred, cropped, and even lightly filtered. These are all possible scenarios of what exactly happens to every profile picture on a real platform.
 
 ## Project Overview
 
 Generative AI has made it trivial to create realistic fake human faces at scale, powering large-scale catfishing and romance scams. Most detection approaches are evaluated only on pristine images, which don't reflect how photos actually move through real platforms. ProfileGuard closes that gap: we specifically train and test against the transformations a profile picture undergoes in the wild (compression, blur, resizing, noise, color adjustment, cropping), and quantify how much robustness training improves survival under each one.
 
-**Our approach in one sentence:** fine-tune a small pretrained EfficientNet-B0 classifier on real vs. AI-generated faces, then further fine-tune it with randomized real-world image corruptions applied during training, so the model learns robust features instead of fragile pixel-level artifacts that vanish under compression or blur.
+**Our approach:** fine-tune a small pretrained EfficientNet-B0 classifier on real vs. AI-generated faces, then further fine-tune it with randomized real-world image corruptions applied during training, so the model learns robust features instead of fragile pixel-level artifacts that vanish under compression or blur.
 
 ## Development Tools & Environment
 
@@ -18,7 +18,7 @@ Generative AI has made it trivial to create realistic fake human faces at scale,
 
 - **Architecture:** EfficientNet-B0 (pretrained on ImageNet), fine-tuned for binary classification (real vs. AI-generated)
 - **Parameters:** ~5.3M 
-- **Training approach:** Transfer learning — early layers frozen, final blocks and classifier head fine-tuned, first on clean data then further fine-tuned with randomized robustness augmentations (JPEG compression, Gaussian blur, downscale/upscale, Gaussian noise, color jitter, center crop) applied per-image during training.
+- **Training approach:** Transfer learning: early layers frozen, final blocks and classifier head fine-tuned, first on clean data then further fine-tuned with randomized robustness augmentations (JPEG compression, Gaussian blur, downscale/upscale, Gaussian noise, color jitter, center crop) applied per-image during training.
 
 ## Datasets
 
@@ -51,11 +51,11 @@ We evaluated both a clean-trained baseline model and our robustness-trained mode
 
 ![Baseline vs Robust-Trained Accuracy](assets/baseline_vs_robust_chart.png)
 
-Robustness training recovered up to **+49.8 percentage points** on the conditions where the baseline model failed most severely (heavy blur, aggressive downscaling, strong noise), while *also* slightly improving clean-image accuracy — showing that robustness training didn't come at the cost of clean performance.
+Robustness training recovered up to **+49.8 percentage points** on the conditions where the baseline model failed most severely (heavy blur, aggressive downscaling, strong noise), while *also* slightly improving clean-image accuracy, showing that robustness training didn't come at the cost of clean performance.
 
 ![Same face degrading across conditions](assets/degradation_example.png)
 
-*Example: the same fake image correctly identified as AI-generated when clean or lightly compressed, but misclassified under heavy blur and noise — illustrating exactly the failure mode robustness training targets.*
+*Example: the same fake image correctly identified as AI-generated when clean or lightly compressed, but misclassified under heavy blur and noise, illustrating exactly the failure mode robustness training targets.*
 
 ---
 
@@ -75,7 +75,7 @@ This breakdown reveals that error *type* isn't uniform across conditions. Under 
 
 **Written analysis:**
 
-Under our most challenging condition for the robustness-trained model (heavy Gaussian noise, σ=0.10), we observed an asymmetric error pattern: false positives (real photos misclassified as AI-generated) outnumbered false negatives (AI photos misclassified as real), with at least 30 versus 21 out of 500 test images. For a fraud-prevention use case like flagging fake dating-app profiles, this is a favorable trade-off, since it errs toward over-flagging rather than letting fake profiles through undetected. A production system could instead route flagged-but-uncertain cases to manual review rather than auto-rejecting them.
+Under our most challenging condition for the robustness-trained model (heavy Gaussian noise, σ=0.10), we observed an asymmetric error pattern: false positives (real photos misclassified as AI-generated) outnumbered false negatives (AI photos misclassified as real), with at least 30 versus 21 out of 500 test images. For a fraud-prevention use case like flagging fake dating-app profiles, this is a favorable trade-off, since it leans toward over-flagging rather than letting fake profiles through undetected. A production system could instead route flagged-but-uncertain cases to manual review rather than auto-rejecting them.
 
 Notably, this pattern is condition-dependent rather than universal: our separate analysis of the baseline model across conditions (chart above) shows that heavy blur produces the *opposite* skew, with an overwhelmingly false negatives rather than false positives. This suggests that different types of image degradation attack the model's decision boundary in different directions. An actual production system should not assume errors will always be conservative (over-flagging) as the specific failure mode depends on what corruption is present.
 
@@ -115,7 +115,7 @@ where `pred` is the model's estimated probability that the image is AI-generated
 - **Heavy Gaussian noise remains our weakest condition** (82% accuracy vs. 96%+ on most other transforms). More noise-specific training data or a denoising pre-processing step could close this gap.
 - **Confidently wrong predictions:** some misclassifications occur with 90%+ confidence rather than being flagged as uncertain. Calibration techniques (e.g. temperature scaling) would help route uncertain cases to human review rather than auto-deciding.
 - **Error direction varies by corruption type:** blur pushes errors toward false negatives while other conditions are more mixed, meaning a deployed system can't assume a single "safe" failure direction.
-- **Potential fairness concerns:** in a small error-sample review, false positives clustered among female subjects and false negatives among male subjects, and false negatives disproportionately involved subjects wearing glasses. These patterns need validation at larger scale with demographic-aware evaluation before deployment — we did not have demographic labels available to confirm this rigorously in the hackathon timeframe.
+- **Potential fairness concerns:** in a small error-sample review, false positives clustered among female subjects and false negatives among male subjects, and false negatives disproportionately involved subjects wearing glasses. These patterns need validation at larger scale with demographic-aware evaluation before deployment. We did not have demographic labels available to confirm this rigorously in the hackathon timeframe.
 - **Single dataset source:** trained and tested on one face dataset (StyleGAN-generated). Generalization to newer generator architectures (diffusion-based face generators, more recent GANs) is untested and likely weaker without additional fine-tuning data.
 - **Given more time**, we would: expand training data to include diffusion-generated faces (not just GAN-generated), add confidence calibration, and run a proper fairness audit across demographic subgroups.
 

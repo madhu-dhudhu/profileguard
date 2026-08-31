@@ -1,5 +1,4 @@
-# ProfileGuard: Robust AI-Generated Face Detection
-### by Team CodeBrew
+# ProfileGuard: Robust AI-Generated Face Detection - Team CodeBrew
 
 ProfileGuard is a lightweight AI-image detector purpose-built to catch AI-generated profile pictures used in catfishing and romance scams on dating apps and social platforms. Unlike detectors that only work on clean, high-resolution images straight from a generator, ProfileGuard is trained and evaluated specifically for real-world conditions: photos that have been resized into thumbnails, JPEG-compressed on upload, blurred, cropped, and even lightly filtered. These are all possible scenarios of what exactly happens to every profile picture on a real platform.
 
